@@ -1,9 +1,11 @@
-# Variables
+#!/usr/bin/env bash
+
+# # Variables
 MYSQL_PASSWORD="root"
 GIT_USER_NAME="luizventurote"
 GIT_USER_EMAIL="luiz_17@ymail.com"
 
-# Update
+# # Update
 apt-get update
 
 # Install Server
@@ -21,15 +23,11 @@ if [ ! -f /etc/apache2/apache2.conf ]; then
 	
 	# Install PHP 5.4
 	echo "-------- Install PHP --------"
-	sudo apt-get install -y python-software-properties build-essential
-	sudo add-apt-repository ppa:ondrej/php5-oldstable -y
+	sudo apt-get install python-software-properties -y
+	sudo add-apt-repository ppa:ondrej/php5 -y
 	sudo apt-get update
-	sudo apt-get install -y php5
-	libapache2-mod-php5 \
-    php5-mysql \
-    php5-curl \
-    php5-xsl \
-    php5-cli
+	sudo apt-get install php5 -y
+	sudo apt-get install libapache2-mod-php5 php5-mysql php5-curl php5-xsl php5-cli -y
 
 	# Enable mod_rewrite
   	a2enmod rewrite
@@ -52,3 +50,44 @@ if [ -z `which git` ]; then
 	echo "Git user name: $GIT_USER_NAME"
 	echo "Git user email: $GIT_USER_EMAIL"
 fi
+
+# Install Zend Skeleton Application
+echo "-------- Install Zend Skeleton Application --------"
+cd /var/www/html
+git clone https://github.com/zendframework/ZendSkeletonApplication app
+cd app
+
+echo "-------- Start Composer --------"
+php composer.phar self-update
+php composer.phar install
+
+# Server configuration
+cd /etc/apache2/sites-available
+rm 000-default.conf
+echo "<VirtualHost *:80>
+	
+	# ServerName   my.domain.com
+	ServerAdmin webmaster@localhost
+	DocumentRoot /var/www/html/app/public
+
+	# Log
+	ErrorLog ${APACHE_LOG_DIR}/error.log
+	CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+	# Rewrite
+	RewriteEngine off
+	<Location />
+        RewriteEngine On
+        RewriteCond %{REQUEST_FILENAME} -s [OR]
+        RewriteCond %{REQUEST_FILENAME} -l [OR]
+        RewriteCond %{REQUEST_FILENAME} -d
+        RewriteRule ^.*$ - [NC,L]
+        RewriteRule ^.*$ /index.php [NC,L]
+    </Location>
+
+</VirtualHost>" >> 000-default.conf
+
+# Restart services
+service apache2 restart
+
+echo "=== INSTALLATION COMPLETED ==="
