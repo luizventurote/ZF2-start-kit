@@ -11,4 +11,7 @@ Vagrant.configure("2") do |config|
   # Sync folders
   config.vm.synced_folder "www", "/var/www/html", create: true
 
+  # Provision
+  config.vm.provision "shell", path: "script.sh"
+
 end
