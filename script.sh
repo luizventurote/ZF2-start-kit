@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
-# # Variables
+# Variables
 MYSQL_PASSWORD="root"
-GIT_USER_NAME="luizventurote"
-GIT_USER_EMAIL="luiz_17@ymail.com"
+GIT_USER_NAME="your_user_name"
+GIT_USER_EMAIL="your_user_email"
 
-# # Update
+# Update
 apt-get update
 
 # Install Server
